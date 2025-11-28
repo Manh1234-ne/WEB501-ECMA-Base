@@ -1,5 +1,5 @@
 
-function Edit() {
+function EditPage() {
   return (
     <div>
       <h1>Cập nhật</h1>
