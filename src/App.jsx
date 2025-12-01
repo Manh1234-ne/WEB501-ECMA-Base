@@ -63,7 +63,8 @@ function App() {
           <Route path="/" element={<ListPage tours={tours} setTours={setTours} />} />
           <Route path="/list" element={<ListPage tours={tours} setTours={setTours} />} />
           <Route path="/add" element={<AddPage destinations={destinations} setTours={setTours} />} />
-          <Route path="/edit/:id" element={<EditPage setTours={setTours} />} />
+          <Route path="/edit/:id" element={<EditPage setTours={setTours} destinations={destinations} />} />
+
         </Routes>
       </div>
 

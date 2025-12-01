@@ -7,7 +7,6 @@ function AddPage({ destinations = [], setTours }) {
   const navigate = useNavigate();
   const initialFetchRef = useRef(false);
 
-  // localDestinations fallback so Add works even if parent didn't provide
   const [localDestinations, setLocalDestinations] = useState(destinations || []);
   const [loadingDestinations, setLoadingDestinations] = useState(false);
 
@@ -24,19 +23,16 @@ function AddPage({ destinations = [], setTours }) {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  // Sync prop -> local list
   useEffect(() => {
     setLocalDestinations(destinations || []);
   }, [destinations]);
 
-  // Set default destination when localDestinations becomes available
   useEffect(() => {
     if (!form.destination && localDestinations.length > 0) {
       setForm((f) => ({ ...f, destination: localDestinations[0].name }));
     }
   }, [localDestinations, form.destination]);
 
-  // Fallback: try to fetch destinations if none provided
   useEffect(() => {
     const fetchFallback = async () => {
       if (initialFetchRef.current) return;
