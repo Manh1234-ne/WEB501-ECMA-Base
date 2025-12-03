@@ -23,18 +23,6 @@
       "available": 20,
       "category": "Tour nội địa",
       "active": true
-    },
-    {
-      "id": "3",
-      "name": "Đà Lạt 4N3D",
-      "destination": "Đà Lạt",
-      "duration": "4 ngày 3 đêm",
-      "price": 3200000,
-      "image": "https://picsum.photos/400/300?random=3",
-      "description": "Thành phố ngàn hoa với khí hậu mát mẻ quanh năm",
-      "available": 10,
-      "category": "Tour nội địa",
-      "active": true
     }
   ],
   "destinations": [
@@ -58,6 +46,11 @@
     }
   ],
   "users": [
-    
+    {
+      "id": "3a71",
+      "name": "manhnon",
+      "email": "manhnon16@gmail.com",
+      "password": "123456"
+    }
   ]
 }

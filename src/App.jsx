@@ -5,6 +5,8 @@ import axios from "axios";
 import ListPage from "./pages/List";
 import AddPage from "./pages/Add";
 import EditPage from "./pages/Edit";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   const [tours, setTours] = useState([]);
@@ -48,10 +50,10 @@ function App() {
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="#" className="hover:text-gray-200">
+            <Link to="login" className="hover:text-gray-200">
               Đăng nhập
             </Link>
-            <Link to="#" className="hover:text-gray-200">
+            <Link to="register" className="hover:text-gray-200">
               Đăng ký
             </Link>
           </div>
@@ -64,6 +66,10 @@ function App() {
           <Route path="/list" element={<ListPage tours={tours} setTours={setTours} />} />
           <Route path="/add" element={<AddPage destinations={destinations} setTours={setTours} />} />
           <Route path="/edit/:id" element={<EditPage setTours={setTours} destinations={destinations} />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+
 
         </Routes>
       </div>
