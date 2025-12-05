@@ -1,54 +1,63 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import { useNavigate, Link } from "react-router-dom";
+import axios from 'axios';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 function LoginPage() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // handleChange
 
+  const handleSubmit = async event => {
+    event.preventDefault(); // ngan can load form
     try {
-      const res = await axios.post("http://localhost:3000/login", {
+      const { data } = await axios.post(' http://localhost:3000/login', {
         email,
         password,
       });
-
-      localStorage.setItem("token", res.data.token);
-      toast.success("Đăng nhập thành công!");
-
-      navigate("/list"); // ✔ đúng route
-    } catch (err) {
-      toast.error("Email hoặc mật khẩu sai!");
+      //   toast.success('Them tour duoc roi');
+      localStorage.setItem('token', data.accessToken);
+    } catch (error) {
+      toast.error(error.message);
     }
   };
-
   return (
-    <div className="max-w-md mx-auto mt-10 border p-6 rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Đăng nhập</h2>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-6">Đăng nhập</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          className="w-full p-2 border mb-3"
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-        />
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        {/* Text input */}
+        <div>
+          <label htmlFor="text" className="block font-medium mb-1">
+            Email
+          </label>
+          <input
+            value={email} // document.getElementBy(id).value
+            onChange={event => setEmail(event.target.value)}
+            type="email"
+            id="text"
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="text" className="block font-medium mb-1">
+            Password
+          </label>
+          <input
+            value={password}
+            onChange={event => setPassword(event.target.value)}
+            type="password"
+            id="text"
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-        <input
-          className="w-full p-2 border mb-3"
-          type="password"
-          placeholder="Mật khẩu"
-          value={password}
-          onChange={(e)=>setPassword(e.target.value)}
-        />
-
-        <button className="w-full bg-blue-600 text-white p-2 rounded">
-          Đăng nhập
+        {/* Submit button */}
+        <button
+          type="submit"
+          className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Submit
         </button>
       </form>
 
