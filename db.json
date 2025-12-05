@@ -47,10 +47,21 @@
   ],
   "users": [
     {
-      "id": "3a71",
-      "name": "manhnon",
       "email": "manhnon16@gmail.com",
-      "password": "123456"
+      "password": "$2a$10$fhPWg6aFS4DdP9nOgobDNOgFijlQJSn/fGVVNd5dsooe.eJH7n6CG",
+      "name": "abc",
+      "id": 1
+    },
+    {
+      "email": "manhnon136@gmail.com",
+      "password": "$2a$10$I.WsfXYSSCx5nqECdmrNheIeWhrLJXOkLWPwJ23JfO7fg8asx8rye",
+      "name": "abc1",
+      "id": 2
+    },
+    {
+      "email": "manhnon146@gmail.com",
+      "password": "$2a$10$tGnmzFAPPyx7au3k57eoO.TsRZEpNo4EA72uzpi6.ni.Ed74YttEm",
+      "id": 3
     }
   ]
 }

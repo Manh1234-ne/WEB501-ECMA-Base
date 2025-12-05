@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { Routes, Route, Link } from "react-router-dom";
 import axios from "axios";
+import HomePage from "./pages/HomePage";
 import ListPage from "./pages/List";
 import AddPage from "./pages/Add";
 import EditPage from "./pages/Edit";
@@ -62,7 +63,7 @@ function App() {
 
       <div className="max-w-6xl mx-auto mt-10 px-4">
         <Routes>
-          <Route path="/" element={<ListPage tours={tours} setTours={setTours} />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/list" element={<ListPage tours={tours} setTours={setTours} />} />
           <Route path="/add" element={<AddPage destinations={destinations} setTours={setTours} />} />
           <Route path="/edit/:id" element={<EditPage setTours={setTours} destinations={destinations} />} />

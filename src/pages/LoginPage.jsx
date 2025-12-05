@@ -1,71 +1,63 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 function LoginPage() {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({
-    email: "",
-    password: ""
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  // handleChange
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async event => {
+    event.preventDefault(); // ngan can load form
     try {
-      const res = await axios.get(
-        `http://localhost:3000/users?email=${form.email}`
-      );
-
-      if (res.data.length === 0) {
-        toast.error("Email không tồn tại!");
-        return;
-      }
-
-      const user = res.data[0];
-
-      if (String(user.password) !== String(form.password)) {
-        toast.error("Mật khẩu sai!");
-        return;
-      }
-
-      toast.success("Đăng nhập thành công!");
-      localStorage.setItem("user", JSON.stringify(user));
-
-      setTimeout(() => navigate("/"), 600);
+      const { data } = await axios.post(' http://localhost:3000/login', {
+        email,
+        password,
+      });
+      //   toast.success('Them tour duoc roi');
+      localStorage.setItem('token', data.accessToken);
     } catch (error) {
-      toast.error("Lỗi đăng nhập!");
+      toast.error(error.message);
     }
   };
-
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Đăng nhập</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-6">Đăng nhập</h1>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          className="w-full border p-2 rounded"
-          onChange={handleChange}
-        />
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        {/* Text input */}
+        <div>
+          <label htmlFor="text" className="block font-medium mb-1">
+            Email
+          </label>
+          <input
+            value={email} // document.getElementBy(id).value
+            onChange={event => setEmail(event.target.value)}
+            type="email"
+            id="text"
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="text" className="block font-medium mb-1">
+            Password
+          </label>
+          <input
+            value={password}
+            onChange={event => setPassword(event.target.value)}
+            type="password"
+            id="text"
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Mật khẩu"
-          className="w-full border p-2 rounded"
-          onChange={handleChange}
-        />
-
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">
-          Đăng nhập
+        {/* Submit button */}
+        <button
+          type="submit"
+          className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Submit
         </button>
       </form>
     </div>
