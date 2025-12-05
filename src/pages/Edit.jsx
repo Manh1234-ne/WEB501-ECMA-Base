@@ -1,136 +1,226 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
-function EditPage({ destinations = [], setTours }) {
+function EditPage({ destinations, setTours }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: "",
-    destination: "",
-    duration: "",
+    description: "",
     price: "",
     image: "",
-    description: "",
-    available: "",
-    category: "Tour nội địa",
-    active: true,
+    destinationId: "",
+    category: "",
+    slots: "",
+    active: true
   });
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const fetchTour = async () => {
       try {
         const res = await axios.get(`http://localhost:3000/tours/${id}`);
-        setForm(res.data);
+        setForm({
+          name: res.data.name,
+          description: res.data.description,
+          price: res.data.price,
+          image: res.data.image,
+          destinationId: res.data.destinationId,
+          category: res.data.category || "",
+          slots: res.data.slots || 0,
+          active: res.data.active
+        });
       } catch (err) {
-        console.error("Lỗi lấy tour:", err);
-        toast.error("Tour không tồn tại!");
-      } finally {
-        setLoading(false);
+        toast.error("Không tải được dữ liệu tour");
       }
     };
-
     fetchTour();
   }, [id]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const validate = () => {
+    if (!form.name || form.name.length < 5 || form.name.length > 100) {
+      toast.error("Tên tour phải từ 5 đến 100 ký tự");
+      return false;
+    }
+    if (!form.description || form.description.length < 10 || form.description.length > 1000) {
+      toast.error("Mô tả phải từ 10 đến 1000 ký tự");
+      return false;
+    }
+    if (!form.price || Number(form.price) <= 0) {
+      toast.error("Giá phải > 0");
+      return false;
+    }
+    try {
+      new URL(form.image);
+    } catch {
+      toast.error("URL hình ảnh không hợp lệ");
+      return false;
+    }
+    if (!form.destinationId) {
+      toast.error("Chọn điểm đến");
+      return false;
+    }
+    if (!form.category) {
+      toast.error("Chọn loại tour");
+      return false;
+    }
+    if (!form.slots || Number(form.slots) < 0) {
+      toast.error("Số lượng chỗ ≥ 0");
+      return false;
+    }
+    return true;
+  };
+
+  const handleChange = e => {
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setForm({ ...form, [e.target.name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const priceNum = Number(form.price);
-    if (!priceNum || priceNum <= 0) {
-      toast.error("Giá phải là số dương.");
-      return;
-    }
-
-    const updatedTour = {
-      ...form,
-      price: priceNum,
-      available: Number(form.available) || 0,
-    };
+    if (!validate()) return;
 
     try {
-      setSaving(true);
-      const res = await axios.put(`http://localhost:3000/tours/${id}`, updatedTour);
+      const updated = {
+        ...form,
+        price: Number(form.price),
+        slots: Number(form.slots)
+      };
 
-      toast.success("Cập nhật tour thành công!");
+      await axios.put(`http://localhost:3000/tours/${id}`, updated);
 
-      if (typeof setTours === "function") {
-        setTours((prev) =>
-          prev.map((t) => (String(t.id) === String(id) ? res.data : t))
-        );
-      }
+      setTours(prev =>
+        prev.map(t => String(t.id) === id ? { ...t, ...updated } : t)
+      );
 
-      setTimeout(() => navigate("/list"), 600);
+      toast.success("Cập nhật tour thành công");
+      navigate("/list");
     } catch (err) {
-      console.error("Lỗi cập nhật:", err);
       toast.error("Cập nhật thất bại");
-    } finally {
-      setSaving(false);
     }
   };
 
-  if (loading) return <div className="p-6">Đang tải dữ liệu...</div>;
-
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-6">Cập nhật Tour</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-6">Chỉnh sửa Tour</h1>
 
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name" className="block font-medium mb-1">Tên Tour</label>
-          <input id="name" name="name" value={form.name} onChange={handleChange} type="text" className="w-full border rounded-lg px-3 py-2" required />
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-2 gap-8">
+
+          {/* LEFT */}
+          <div className="space-y-4">
+
+            <div>
+              <label className="block mb-1">Tên Tour</label>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1">Mô tả</label>
+              <textarea
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2 h-28"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="block mb-1">Giá</label>
+              <input
+                type="number"
+                name="price"
+                value={form.price}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1">Hình ảnh (URL)</label>
+              <input
+                type="text"
+                name="image"
+                value={form.image}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full mt-4"
+            >
+              Cập nhật Tour
+            </button>
+          </div>
+
+          {/* RIGHT */}
+          <div className="space-y-4">
+
+            <div>
+              <label className="block mb-1">Điểm đến</label>
+              <select
+                name="destinationId"
+                value={form.destinationId}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">-- Chọn điểm đến --</option>
+                {destinations.map(dest => (
+                  <option key={dest.id} value={dest.id}>
+                    {dest.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1">Loại tour</label>
+              <select
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">-- Chọn loại tour --</option>
+                <option value="tour nội địa">Tour nội địa</option>
+                <option value="tour quốc tế">Tour quốc tế</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-1">Số lượng chỗ</label>
+              <input
+                type="number"
+                name="slots"
+                value={form.slots}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="active"
+                checked={form.active}
+                onChange={handleChange}
+              />
+              <label>Đang hoạt động</label>
+            </div>
+
+            
+          </div>
+
         </div>
-
-        <div>
-          <label htmlFor="destination" className="block font-medium mb-1">Điểm đến</label>
-          <select id="destination" name="destination" value={form.destination} onChange={handleChange} className="w-full border rounded-lg px-3 py-2 bg-white" required>
-            {destinations.map((d) => (
-              <option key={d.id} value={d.name}>{d.name}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="duration" className="block font-medium mb-1">Thời lượng</label>
-          <input id="duration" name="duration" value={form.duration} onChange={handleChange} type="text" placeholder="Ví dụ: 3 ngày 2 đêm" className="w-full border rounded-lg px-3 py-2" />
-        </div>
-
-        <div>
-          <label htmlFor="price" className="block font-medium mb-1">Giá (VND)</label>
-          <input id="price" name="price" value={form.price} onChange={handleChange} type="number" min="0" className="w-full border rounded-lg px-3 py-2" required />
-        </div>
-
-        <div>
-          <label htmlFor="available" className="block font-medium mb-1">Số lượng còn (available)</label>
-          <input id="available" name="available" value={form.available} onChange={handleChange} type="number" min="0" className="w-full border rounded-lg px-3 py-2" />
-        </div>
-
-        <div>
-          <label htmlFor="image" className="block font-medium mb-1">URL ảnh</label>
-          <input id="image" name="image" value={form.image} onChange={handleChange} type="text" placeholder="https://example.com/pic.jpg" className="w-full border rounded-lg px-3 py-2" />
-        </div>
-
-        <div>
-          <label htmlFor="description" className="block font-medium mb-1">Mô tả</label>
-          <textarea id="description" name="description" value={form.description} onChange={handleChange} rows="4" className="w-full border rounded-lg px-3 py-2" />
-        </div>
-
-        <button type="submit" disabled={saving} className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          {saving ? "Đang lưu..." : "Lưu thay đổi"}
-        </button>
       </form>
     </div>
   );

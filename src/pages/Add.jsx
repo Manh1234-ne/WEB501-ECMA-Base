@@ -1,198 +1,155 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
-function AddPage({ destinations = [], setTours }) {
+function AddPage({ destinations, setTours }) {
   const navigate = useNavigate();
-  const initialFetchRef = useRef(false);
-
-  const [localDestinations, setLocalDestinations] = useState(destinations || []);
-  const [loadingDestinations, setLoadingDestinations] = useState(false);
-
   const [form, setForm] = useState({
     name: "",
-    destination: "",
-    duration: "",
+    description: "",
     price: "",
     image: "",
-    description: "",
-    available: "",
-    category: "Tour nội địa",
-    active: true,
+    destinationId: "",
+    category: "",        
+    slots: "",          
+    active: true        
   });
-  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    setLocalDestinations(destinations || []);
-  }, [destinations]);
-
-  useEffect(() => {
-    if (!form.destination && localDestinations.length > 0) {
-      setForm((f) => ({ ...f, destination: localDestinations[0].name }));
+  const validate = () => {
+    if (!form.name || form.name.length < 5 || form.name.length > 100) {
+      toast.error("Tên tour phải từ 5 đến 100 ký tự");
+      return false;
     }
-  }, [localDestinations, form.destination]);
-
-  useEffect(() => {
-    const fetchFallback = async () => {
-      if (initialFetchRef.current) return;
-      if ((destinations?.length || 0) > 0) return;
-      initialFetchRef.current = true;
-      try {
-        setLoadingDestinations(true);
-        const res = await axios.get("http://localhost:3000/destinations");
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          setLocalDestinations(res.data);
-        }
-      } catch (err) {
-        console.warn("Không lấy được destinations: ", err.message || err);
-      } finally {
-        setLoadingDestinations(false);
-      }
-    };
-
-    fetchFallback();
-  }, [destinations]);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const val = type === "checkbox" ? checked : value;
-    setForm((prev) => ({ ...prev, [name]: val }));
+    if (!form.description || form.description.length < 10 || form.description.length > 1000) {
+      toast.error("Mô tả phải từ 10 đến 1000 ký tự");
+      return false;
+    }
+    if (!form.price || Number(form.price) <= 0) {
+      toast.error("Giá phải > 0");
+      return false;
+    }
+    try {
+      new URL(form.image);
+    } catch {
+      toast.error("URL hình ảnh không hợp lệ");
+      return false;
+    }
+    if (!form.destinationId) {
+      toast.error("Vui lòng chọn điểm đến");
+      return false;
+    }
+    if (!form.category) {
+      toast.error("Chọn loại tour");
+      return false;
+    }
+    if (!form.slots || Number(form.slots) < 0) {
+      toast.error("Số lượng chỗ phải ≥ 0");
+      return false;
+    }
+    return true;
   };
 
-  const handleRetryFetch = async () => {
-    try {
-      setLoadingDestinations(true);
-      const res = await axios.get("http://localhost:3000/destinations");
-      setLocalDestinations(res.data || []);
-      toast.success("Lấy điểm đến thành công");
-    } catch (err) {
-      console.error("Lỗi lấy destinations:", err);
-      toast.error("Lấy điểm đến thất bại");
-    } finally {
-      setLoadingDestinations(false);
-    }
+  const handleChange = (e) => {
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setForm({ ...form, [e.target.name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!form.name.trim()) {
-      toast.error("Vui lòng nhập tên tour.");
-      return;
-    }
-    if (!form.destination) {
-      toast.error("Vui lòng chọn điểm đến.");
-      return;
-    }
-    const priceNum = Number(form.price);
-    if (!priceNum || priceNum <= 0) {
-      toast.error("Giá phải là số dương.");
-      return;
-    }
-    const availableNum = Number(form.available) || 0;
-
-    const newTour = {
-      name: form.name,
-      destination: form.destination,
-      duration: form.duration || "",
-      price: priceNum,
-      image: form.image || `https://picsum.photos/400/300?random=${Date.now()}`,
-      description: form.description || "",
-      available: availableNum,
-      category: form.category,
-      active: !!form.active,
-    };
+    if (!validate()) return;
 
     try {
-      setSubmitting(true);
-      const res = await axios.post("http://localhost:3000/tours", newTour);
-      const created = res.data;
-      toast.success("Thêm tour thành công!");
-
-      if (typeof setTours === "function") {
-        setTours((prev = []) => [...prev, created]);
-      }
-
-      setForm({
-        name: "",
-        destination: localDestinations.length > 0 ? localDestinations[0].name : "",
-        duration: "",
-        price: "",
-        image: "",
-        description: "",
-        available: "",
-        category: "Tour nội địa",
-        active: true,
+      const res = await axios.post("http://localhost:3000/tours", {
+        ...form,
+        price: Number(form.price),
+        slots: Number(form.slots)
       });
-
-      setTimeout(() => navigate("/list"), 600);
+      setTours((prev) => [...prev, res.data]);
+      toast.success("Thêm tour thành công");
+      navigate("/list");
     } catch (err) {
-      console.error("Lỗi khi thêm tour:", err);
-      toast.error(err.response?.data?.message || "Thêm tour thất bại");
-    } finally {
-      setSubmitting(false);
+      toast.error("Thêm thất bại");
+      console.error(err);
     }
   };
 
-  const noDestinations = localDestinations.length === 0;
-
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-6">Thêm mới Tour</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-6">Thêm Tour mới</h1>
 
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name" className="block font-medium mb-1">Tên Tour</label>
-          <input id="name" name="name" value={form.name} onChange={handleChange} type="text" className="w-full border rounded-lg px-3 py-2" required />
-        </div>
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-2 gap-8">
 
-        <div>
-          <label htmlFor="destination" className="block font-medium mb-1">Điểm đến</label>
-          <select id="destination" name="destination" value={form.destination} onChange={handleChange} className="w-full border rounded-lg px-3 py-2 bg-white" required disabled={noDestinations || loadingDestinations}>
-            {noDestinations ? (
-              <option value="">-- Không có điểm đến --</option>
-            ) : (
-              localDestinations.map((d) => <option key={d.id} value={d.name}>{d.name}</option>)
-            )}
-          </select>
-
-          {noDestinations && (
-            <div className="mt-2 text-sm text-gray-600">
-              Không có điểm đến. <button type="button" onClick={handleRetryFetch} className="underline text-blue-600">{loadingDestinations ? "Đang thử lại..." : "Thử lấy lại"}</button> hoặc chạy json-server:
-              <pre className="text-xs bg-gray-100 p-2 rounded mt-1">json-server --watch db.json --port 3000</pre>
+          {/* LEFT */}
+          <div className="space-y-4">
+            <div>
+              <label className="block mb-1">Tên Tour</label>
+              <input type="text" name="name" className="w-full border rounded px-3 py-2"
+                value={form.name} onChange={handleChange} />
             </div>
-          )}
-        </div>
 
-        <div>
-          <label htmlFor="duration" className="block font-medium mb-1">Thời lượng</label>
-          <input id="duration" name="duration" value={form.duration} onChange={handleChange} type="text" placeholder="Ví dụ: 3 ngày 2 đêm" className="w-full border rounded-lg px-3 py-2" />
-        </div>
+            <div>
+              <label className="block mb-1">Mô tả</label>
+              <textarea name="description" className="w-full border rounded px-3 py-2 h-28"
+                value={form.description} onChange={handleChange}></textarea>
+            </div>
 
-        <div>
-          <label htmlFor="price" className="block font-medium mb-1">Giá (VND)</label>
-          <input id="price" name="price" value={form.price} onChange={handleChange} type="number" min="0" className="w-full border rounded-lg px-3 py-2" required />
-        </div>
+            <div>
+              <label className="block mb-1">Giá</label>
+              <input type="number" name="price" className="w-full border rounded px-3 py-2"
+                value={form.price} onChange={handleChange} />
+            </div>
 
-        <div>
-          <label htmlFor="available" className="block font-medium mb-1">Số lượng còn (available)</label>
-          <input id="available" name="available" value={form.available} onChange={handleChange} type="number" min="0" className="w-full border rounded-lg px-3 py-2" />
-        </div>
+            <div>
+              <label className="block mb-1">Hình ảnh (URL)</label>
+              <input type="text" name="image" className="w-full border rounded px-3 py-2"
+                value={form.image} onChange={handleChange} />
+            </div>
+            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4 w-full">
+              Thêm Tour
+            </button>
+          </div>
+          
 
-        <div>
-          <label htmlFor="image" className="block font-medium mb-1">URL ảnh</label>
-          <input id="image" name="image" value={form.image} onChange={handleChange} type="text" placeholder="https://example.com/pic.jpg" className="w-full border rounded-lg px-3 py-2" />
-        </div>
+          {/* RIGHT */}
+          <div className="space-y-4">
+            <div>
+              <label className="block mb-1">Điểm đến</label>
+              <select name="destinationId" className="w-full border rounded px-3 py-2"
+                value={form.destinationId} onChange={handleChange}>
+                <option value="">-- Chọn điểm đến --</option>
+                {destinations.map((d) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+            </div>
 
-        <div>
-          <label htmlFor="description" className="block font-medium mb-1">Mô tả</label>
-          <textarea id="description" name="description" value={form.description} onChange={handleChange} rows="4" className="w-full border rounded-lg px-3 py-2" />
-        </div>
+            <div>
+              <label className="block mb-1">Loại tour</label>
+              <select name="category" className="w-full border rounded px-3 py-2"
+                value={form.category} onChange={handleChange}>
+                <option value="">-- Chọn loại tour --</option>
+                <option value="tour nội địa">Tour nội địa</option>
+                <option value="tour quốc tế">Tour quốc tế</option>
+              </select>
+            </div>
 
-        <button type="submit" disabled={submitting || noDestinations} className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          {submitting ? "Đang thêm..." : "Thêm Tour"}
-        </button>
+            <div>
+              <label className="block mb-1">Số lượng chỗ</label>
+              <input type="number" name="slots" className="w-full border rounded px-3 py-2"
+                value={form.slots} onChange={handleChange} />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input type="checkbox" name="active"
+                checked={form.active} onChange={handleChange} />
+              <label>Đang hoạt động</label>
+            </div>
+
+            
+          </div>
+        </div>
       </form>
     </div>
   );

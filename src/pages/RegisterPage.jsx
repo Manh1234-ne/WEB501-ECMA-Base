@@ -1,80 +1,58 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function RegisterPage() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.email || !form.password) {
-      toast.error("Vui lòng nhập đầy đủ thông tin");
-      return;
-    }
-
     try {
-      const check = await axios.get(
-        `http://localhost:3000/users?email=${form.email}`
-      );
-      if (check.data.length > 0) {
-        toast.error("Email đã tồn tại!");
-        return;
-      }
-
-      await axios.post("http://localhost:3000/users", form);
+      await axios.post("http://localhost:3000/register", {
+        email,
+        password,
+      });
 
       toast.success("Đăng ký thành công!");
-      setTimeout(() => navigate("/login"), 700);
+      navigate("/login");
     } catch (err) {
-      toast.error("Lỗi đăng ký!");
+      toast.error("Đăng ký thất bại!");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Đăng ký</h1>
+    <div className="max-w-md mx-auto mt-10 border p-6 rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">Đăng ký</h2>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <input
-          name="name"
-          type="text"
-          placeholder="Họ tên"
-          className="w-full border p-2 rounded"
-          onChange={handleChange}
-        />
-
-        <input
-          name="email"
+          className="w-full p-2 border mb-3"
           type="email"
           placeholder="Email"
-          className="w-full border p-2 rounded"
-          onChange={handleChange}
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
         />
 
         <input
-          name="password"
+          className="w-full p-2 border mb-3"
           type="password"
           placeholder="Mật khẩu"
-          className="w-full border p-2 rounded"
-          onChange={handleChange}
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
         />
 
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button className="w-full bg-green-600 text-white p-2 rounded">
           Đăng ký
         </button>
       </form>
+
+      <p className="text-center mt-4">
+        Đã có tài khoản? <Link className="text-blue-500" to="/login">Đăng nhập</Link>
+      </p>
     </div>
   );
 }

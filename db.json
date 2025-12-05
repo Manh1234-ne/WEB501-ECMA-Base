@@ -1,28 +1,37 @@
 {
   "tours": [
     {
-      "id": "1",
-      "name": "Hạ Long - SaPa 2N1D",
-      "destination": "Sapa",
-      "duration": "2 ngày 1 đêm",
-      "price": 12000000,
-      "image": "https://th.bing.com/th/id/OIP.9SaEJgm_WOghq58rxLjv-wHaFj?w=268&h=201&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-      "description": "Du Lịch Sapa",
-      "available": 10,
-      "category": "Tour nội địa",
-      "active": true
+      "name": "12333",
+      "description": "123111111111111111",
+      "price": 12314,
+      "image": "https://th.bing.com/th/id/OIP.kCGFv3O6zFIHC5iJjXC0rQHaEn?w=280&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.3&pid=1.7&rm=3&ucfimg=1",
+      "destinationId": "3",
+      "category": "tour quốc tế",
+      "slots": 12,
+      "active": true,
+      "id": 1
     },
     {
-      "id": "2",
-      "name": "Hạ Long - Cát Bà 2N1D",
-      "destination": "Hạ Long",
-      "duration": "2 ngày 1 đêm",
-      "price": 1800000,
-      "image": "https://picsum.photos/400/300?random=2",
-      "description": "Du thuyền vịnh Hạ Long - Kỳ quan thiên nhiên thế giới",
-      "available": 20,
-      "category": "Tour nội địa",
-      "active": true
+      "name": "12333",
+      "description": "11111111111111111111",
+      "price": 12314,
+      "image": "https://th.bing.com/th/id/OIP.kCGFv3O6zFIHC5iJjXC0rQHaEn?w=280&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.3&pid=1.7&rm=3&ucfimg=1",
+      "destinationId": "3",
+      "category": "tour nội địa",
+      "slots": 12,
+      "active": true,
+      "id": 2
+    },
+    {
+      "name": "hello",
+      "description": "1211111111111111",
+      "price": 12314,
+      "image": "https://th.bing.com/th/id/OIP.kCGFv3O6zFIHC5iJjXC0rQHaEn?w=280&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.3&pid=1.7&rm=3&ucfimg=1",
+      "destinationId": "3",
+      "category": "tour nội địa",
+      "slots": 12,
+      "active": false,
+      "id": 3
     }
   ],
   "destinations": [
@@ -47,10 +56,41 @@
   ],
   "users": [
     {
-      "id": "3a71",
-      "name": "manhnon",
       "email": "manhnon16@gmail.com",
-      "password": "123456"
+      "password": "$2a$10$fhPWg6aFS4DdP9nOgobDNOgFijlQJSn/fGVVNd5dsooe.eJH7n6CG",
+      "name": "abc",
+      "id": 1
+    },
+    {
+      "email": "manhnon136@gmail.com",
+      "password": "$2a$10$I.WsfXYSSCx5nqECdmrNheIeWhrLJXOkLWPwJ23JfO7fg8asx8rye",
+      "name": "abc1",
+      "id": 2
+    },
+    {
+      "email": "manhnon146@gmail.com",
+      "password": "$2a$10$tGnmzFAPPyx7au3k57eoO.TsRZEpNo4EA72uzpi6.ni.Ed74YttEm",
+      "id": 3
+    },
+    {
+      "email": "manhnon156@gmail.com",
+      "password": "$2a$10$5TRdL2m/6oUtbdjrff/RqeJIekfXfgIlirBUxOtWi7UQchIEp3ofS",
+      "id": 4
+    },
+    {
+      "email": "manhnon186@gmail.com",
+      "password": "$2a$10$aIa/8m6aXTRzYv7X6Y917Om3lhrEi27U8wUNcxlj2zBGPsWmulYyC",
+      "id": 5
+    },
+    {
+      "email": "hello2@gmail.com",
+      "password": "$2a$10$/XLAZ05IpRIYVOzUjRllguXYDKsEVowbIT7zDeNaPMu2CdiSHptw.",
+      "id": 6
+    },
+    {
+      "email": "manhnon26@gmail.com",
+      "password": "$2a$10$Xoh9peBrLlEWB62/tKDXD.4S3v5Z/7IPxcHfDFtJcM/h1QtjAHD/a",
+      "id": 7
     }
   ]
 }

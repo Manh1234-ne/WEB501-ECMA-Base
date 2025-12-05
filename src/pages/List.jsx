@@ -3,96 +3,122 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 function ListPage({ tours, setTours }) {
-  const [deletingId, setDeletingId] = useState(null);
+  const [filterName, setFilterName] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn chắc chắn muốn xóa Tour này chứ?")) return;
-
     try {
-      setDeletingId(id);
-      const res = await axios.delete(`http://localhost:3000/tours/${id}`);
-
-      if (res.status === 200 || res.status === 204) {
-        if (typeof setTours === "function") {
-          setTours((prevTours) => prevTours.filter((t) => String(t.id) !== String(id)));
-        }
-      } else {
-        alert(`Xóa thất bại, server trả về: ${res.status}`);
-      }
-    } catch (error) {
-      console.error("Xóa tour thất bại:", error);
-      alert(
-        "Xóa tour thất bại: " +
-        (error.response?.data?.message ||
-          error.response?.statusText ||
-          error.message ||
-          "Không rõ lỗi")
-      );
-    } finally {
-      setDeletingId(null);
+      await axios.delete(`http://localhost:3000/tours/${id}`);
+      setTours(prev => prev.filter(t => String(t.id) !== String(id)));
+    } catch (err) {
+      alert("Xóa thất bại");
     }
   };
 
-  const truncate = (text, n = 80) => (text && text.length > n ? text.slice(0, n) + "..." : text || "-");
+  const handleToggleActive = async (tour) => {
+    try {
+      const updated = { ...tour, active: !tour.active };
+      await axios.put(`http://localhost:3000/tours/${tour.id}`, updated);
+      setTours(prev => prev.map(t => t.id === tour.id ? updated : t));
+    } catch (err) {
+      alert("Cập nhật thất bại");
+    }
+  };
+
+  const filteredTours = tours.filter(t =>
+    t.name.toLowerCase().includes(filterName.toLowerCase()) &&
+    (filterStatus === "all" || (filterStatus === "active" ? t.active : !t.active))
+  );
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-6">Danh sách Tour</h1>
 
+      <div className="flex gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Tìm theo tên..."
+          value={filterName}
+          onChange={e => setFilterName(e.target.value)}
+          className="border px-3 py-1 rounded"
+        />
+        <select
+          value={filterStatus}
+          onChange={e => setFilterStatus(e.target.value)}
+          className="border px-3 py-1 rounded"
+        >
+          <option value="all">Tất cả</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full border border-gray-300 rounded-lg">
           <thead className="bg-gray-100">
             <tr>
-              <th className="px-4 py-2 border border-gray-300 text-left">#</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Ảnh</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Tên Tour</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Điểm đến</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Thời lượng</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Giá (VND)</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Số lượng</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Mô tả</th>
-              <th className="px-4 py-2 border border-gray-300 text-left">Thao tác</th>
+              <th className="px-4 py-2 border">#</th>
+              <th className="px-4 py-2 border">Tên tour</th>
+              <th className="px-4 py-2 border">Giá</th>
+              <th className="px-4 py-2 border">Hình ảnh</th>
+              <th className="px-4 py-2 border">Số lượng</th>
+              <th className="px-4 py-2 border">Loại tour</th>
+              <th className="px-4 py-2 border">Active</th>
+              <th className="px-4 py-2 border">Thao tác</th>
             </tr>
           </thead>
 
           <tbody>
-            {tours.map((tour, index) => (
-              <tr key={tour.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border border-gray-300">{index + 1}</td>
+            {filteredTours.map((tour, index) => (
+              <tr key={tour.id}>
+                <td className="px-4 py-2 border">{index + 1}</td>
+                <td className="px-4 py-2 border">{tour.name}</td>
 
-                <td className="px-4 py-2 border border-gray-300">
-                  {tour.image ? (
-                    <img src={tour.image} alt={tour.name} className="w-24 h-14 object-cover rounded" />
-                  ) : (
-                    <div className="w-24 h-14 bg-gray-100 flex items-center justify-center text-xs text-gray-500 rounded">No image</div>
-                  )}
+                <td className="px-4 py-2 border">
+                  {tour.price.toLocaleString()} đ
                 </td>
 
-                <td className="px-4 py-2 border border-gray-300">{tour.name}</td>
-                <td className="px-4 py-2 border border-gray-300">{tour.destination}</td>
-                <td className="px-4 py-2 border border-gray-300">{tour.duration || "-"}</td>
-                <td className="px-4 py-2 border border-gray-300">{tour.price?.toLocaleString?.() ?? tour.price}</td>
-                <td className="px-4 py-2 border border-gray-300">{tour.available ?? 0}</td>
-                <td className="px-4 py-2 border border-gray-300 text-left">{truncate(tour.description, 100)}</td>
+                <td className="px-4 py-2 border">
+                  <img
+                    src={tour.image}
+                    alt=""
+                    className="w-16 h-16 rounded object-cover border"
+                  />
+                </td>
 
-                <td className="px-4 py-2 border border-gray-300">
-                  <div className="flex items-center gap-2">
-                    <Link to={`/edit/${tour.id}`} className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Sửa</Link>
-                    <button
-                      onClick={() => handleDelete(tour.id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                      disabled={deletingId === tour.id}
-                    >
-                      {deletingId === tour.id ? "Đang xóa..." : "Xóa"}
-                    </button>
-                  </div>
+                <td className="px-4 py-2 border">{tour.slots}</td>
+
+                <td className="px-4 py-2 border">{tour.category}</td>
+
+                <td className="px-4 py-2 border">
+                  <input
+                    type="checkbox"
+                    checked={tour.active}
+                    onChange={() => handleToggleActive(tour)}
+                  />
+                </td>
+
+                <td className="px-4 py-2 border">
+                  <Link
+                    to={`/edit/${tour.id}`}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2"
+                  >
+                    Sửa
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(tour.id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Xóa
+                  </button>
                 </td>
               </tr>
             ))}
 
-            {tours.length === 0 && (
+            {filteredTours.length === 0 && (
               <tr>
-                <td colSpan={9} className="text-center py-4 text-gray-500">
+                <td colSpan={10} className="text-center py-4 text-gray-500">
                   Không có tour nào.
                 </td>
               </tr>
