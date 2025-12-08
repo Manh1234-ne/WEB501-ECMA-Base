@@ -3,7 +3,7 @@
     {
       "name": "12333",
       "description": "123111111111111111",
-      "price": 12314,
+      "price": 12000000,
       "image": "https://th.bing.com/th/id/OIP.kCGFv3O6zFIHC5iJjXC0rQHaEn?w=280&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.3&pid=1.7&rm=3&ucfimg=1",
       "destinationId": "3",
       "category": "tour quốc tế",
@@ -71,6 +71,41 @@
       "email": "manhnon146@gmail.com",
       "password": "$2a$10$tGnmzFAPPyx7au3k57eoO.TsRZEpNo4EA72uzpi6.ni.Ed74YttEm",
       "id": 3
+    },
+    {
+      "email": "manhnon156@gmail.com",
+      "password": "$2a$10$5TRdL2m/6oUtbdjrff/RqeJIekfXfgIlirBUxOtWi7UQchIEp3ofS",
+      "id": 4
+    },
+    {
+      "email": "manhnon186@gmail.com",
+      "password": "$2a$10$aIa/8m6aXTRzYv7X6Y917Om3lhrEi27U8wUNcxlj2zBGPsWmulYyC",
+      "id": 5
+    },
+    {
+      "email": "hello2@gmail.com",
+      "password": "$2a$10$/XLAZ05IpRIYVOzUjRllguXYDKsEVowbIT7zDeNaPMu2CdiSHptw.",
+      "id": 6
+    },
+    {
+      "email": "manhnon26@gmail.com",
+      "password": "$2a$10$Xoh9peBrLlEWB62/tKDXD.4S3v5Z/7IPxcHfDFtJcM/h1QtjAHD/a",
+      "id": 7
+    },
+    {
+      "email": "manhnon116@gmail.com",
+      "password": "$2a$10$wRDVyEK6NjiIb2/f.JEN9.j5UXl2bLmxd4cglZq1iJqNaqDI21NA6",
+      "id": 8
+    },
+    {
+      "email": "manhnon126@gmail.com",
+      "password": "$2a$10$VYxOHfUu42NgH7am4K.98uAHpVgH7t1fWLdbgW5eI0ko6ctD.UhH2",
+      "id": 9
+    },
+    {
+      "email": "manhnon1236@gmail.com",
+      "password": "$2a$10$nVL0cM2q2uYjYiihWaFg6uOyUmLGXKQqY77PEWd64ItEwuoajFGma",
+      "id": 10
     }
   ]
 }

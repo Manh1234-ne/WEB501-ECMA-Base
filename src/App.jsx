@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 import ListPage from "./pages/List";
 import AddPage from "./pages/Add";
 import EditPage from "./pages/Edit";
+import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
@@ -13,16 +15,16 @@ function App() {
   const [destinations, setDestinations] = useState([]);
   const navigate = useNavigate();
 
-  // fetch initial data
+  // Load initial data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [toursRes, destRes] = await Promise.all([
+        const [t, d] = await Promise.all([
           axios.get("http://localhost:3000/tours"),
           axios.get("http://localhost:3000/destinations"),
         ]);
-        setTours(toursRes.data || []);
-        setDestinations(destRes.data || []);
+        setTours(t.data || []);
+        setDestinations(d.data || []);
       } catch (err) {
         console.error(err);
       }
@@ -35,7 +37,7 @@ function App() {
     navigate("/login");
   };
 
-  // FIXED ProtectedRoute
+  // --- ProtectedRoute ---
   const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem("token");
     if (!token) return <Navigate to="/login" replace />;
@@ -44,6 +46,7 @@ function App() {
 
   return (
     <>
+      {/* NAVIGATION */}
       <nav className="bg-blue-600 text-white shadow">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="text-xl font-semibold"><strong>WEB501 App</strong></Link>
@@ -68,14 +71,14 @@ function App() {
       </nav>
 
       <div className="max-w-6xl mx-auto mt-10 px-4">
+
         <Routes>
-          <Route path="/" element={<ListPage tours={tours} setTours={setTours} />} />
-          <Route path="/list" element={<ListPage tours={tours} setTours={setTours} />} />
-          <Route path="/add" element={<AddPage destinations={destinations} setTours={setTours} />} />
-          <Route path="/edit/:id" element={<EditPage setTours={setTours} destinations={destinations} />} />
+          {/* Public */}
+          <Route path="/" element={<HomePage tours={tours} setTours={setTours} />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
+          {/* Protected */}
           <Route
             path="/list"
             element={
@@ -102,7 +105,11 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Default */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+
       </div>
 
       <Toaster />

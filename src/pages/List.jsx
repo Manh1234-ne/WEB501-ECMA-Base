@@ -8,6 +8,7 @@ function ListPage({ tours, setTours }) {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn chắc chắn muốn xóa Tour này chứ?")) return;
+
     try {
       await axios.delete(`http://localhost:3000/tours/${id}`);
       setTours(prev => prev.filter(t => String(t.id) !== String(id)));
@@ -20,12 +21,16 @@ function ListPage({ tours, setTours }) {
     try {
       const updated = { ...tour, active: !tour.active };
       await axios.put(`http://localhost:3000/tours/${tour.id}`, updated);
-      setTours(prev => prev.map(t => t.id === tour.id ? updated : t));
+
+      setTours(prev =>
+        prev.map(t => t.id === tour.id ? updated : t)
+      );
     } catch (err) {
       alert("Cập nhật thất bại");
     }
   };
 
+  // đảm bảo dữ liệu slots không undefined
   const filteredTours = tours.filter(t =>
     t.name.toLowerCase().includes(filterName.toLowerCase()) &&
     (filterStatus === "all" || (filterStatus === "active" ? t.active : !t.active))
@@ -43,6 +48,7 @@ function ListPage({ tours, setTours }) {
           onChange={e => setFilterName(e.target.value)}
           className="border px-3 py-1 rounded"
         />
+
         <select
           value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
@@ -73,10 +79,11 @@ function ListPage({ tours, setTours }) {
             {filteredTours.map((tour, index) => (
               <tr key={tour.id}>
                 <td className="px-4 py-2 border">{index + 1}</td>
+
                 <td className="px-4 py-2 border">{tour.name}</td>
 
                 <td className="px-4 py-2 border">
-                  {tour.price.toLocaleString()} đ
+                  {Number(tour.price).toLocaleString()} đ
                 </td>
 
                 <td className="px-4 py-2 border">
@@ -87,7 +94,11 @@ function ListPage({ tours, setTours }) {
                   />
                 </td>
 
-                <td className="px-4 py-2 border">{tour.slots}</td>
+                <td className="px-4 py-2 border">
+                  {tour.slots !== undefined && tour.slots !== null
+                    ? Number(tour.slots)
+                    : "Không có"}
+                </td>
 
                 <td className="px-4 py-2 border">{tour.category}</td>
 
@@ -106,6 +117,7 @@ function ListPage({ tours, setTours }) {
                   >
                     Sửa
                   </Link>
+
                   <button
                     onClick={() => handleDelete(tour.id)}
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
