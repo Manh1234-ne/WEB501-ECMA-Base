@@ -11,20 +11,16 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
 function App() {
-  const [tours, setTours] = useState([]);
-  const [destinations, setDestinations] = useState([]);
+  const [sinhviens, setSinhviens] = useState([]);
   const navigate = useNavigate();
 
-  // Load initial data
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [t, d] = await Promise.all([
-          axios.get("http://localhost:3000/tours"),
-          axios.get("http://localhost:3000/destinations"),
+          axios.get("http://localhost:3000/sinhviens"),
         ]);
-        setTours(t.data || []);
-        setDestinations(d.data || []);
+        setSinhviens(t.data || []);
       } catch (err) {
         console.error(err);
       }
@@ -74,7 +70,7 @@ function App() {
 
         <Routes>
           {/* Public */}
-          <Route path="/" element={<HomePage tours={tours} setTours={setTours} />} />
+          <Route path="/" element={<HomePage sinhviens={sinhviens} setSinhviens={setSinhviens} />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
@@ -83,7 +79,7 @@ function App() {
             path="/list"
             element={
               <ProtectedRoute>
-                <ListPage tours={tours} setTours={setTours} />
+                <ListPage sinhviens={sinhviens} setSinhviens={setSinhviens} />
               </ProtectedRoute>
             }
           />
@@ -92,7 +88,7 @@ function App() {
             path="/add"
             element={
               <ProtectedRoute>
-                <AddPage destinations={destinations} setTours={setTours} />
+                <AddPage setSinhviens={setSinhviens} />
               </ProtectedRoute>
             }
           />
@@ -101,7 +97,7 @@ function App() {
             path="/edit/:id"
             element={
               <ProtectedRoute>
-                <EditPage destinations={destinations} setTours={setTours} />
+                <EditPage setSinhviens={setSinhviens} />
               </ProtectedRoute>
             }
           />
